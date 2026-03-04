@@ -132,34 +132,42 @@ df = pandas.read_csv()
 
 Quel est le type de l'objet `df`?
 ```
-
+pandas.DataFrame
 ```
 
 ##### Descriptions d'une table de données
 Que permettent les méthodes suivantes?
 ###### df.shape
 ```
+df.shape => (2024, 7) c'est la taille de l'objet df, ici 2024 lignes et 7 colonnes
 ```
 ###### df.head()
 ```
+retourne les x premières lignes de l'objets
 ```
 ###### df.tail()
 ```
+retourne les x dernières lignes de df
 ```
 ###### df.columns
 ```
+retourne une liste avec le nom des colonnes
 ```
 ###### df.dtypes
 ```
+Retourne chaque colone avec le type associé
 ```
 ###### df.info
 ```
+Affiche les info de l'objet: le nombre de valeurs non null dans chanque colonnes, l'espace qu'il prend en mémoire, 
 ```
 ###### df.describe()
 ```
+Retourne des statistiques descriptives des colonnes d'un type numérique (int, float, etc)
 ```
 ###### df.dropna()
 ```
+Retourne toutes le lignes du tableau qui n'ont aucune valeur nulle
 ```
 
 ##### Accès aux éléments d'une table de données
@@ -169,6 +177,7 @@ values = df[['Description', 'Gene Symbol']]
 ```
 
 Quel est le type de `values` ?
+---->pandas.DataFrame
 
 Verifiez si certaines méthodes de `DataFrame` lui sont applicables.
 Ce type supporte l'accès par indice et les slice `[a:b]`
@@ -179,17 +188,17 @@ On peut accéder aux valeurs du DataFrame via des indices ou plages d'indice. La
 Il y a différentes manières de le faire, l'utilisation de `.iloc[slice_ligne,slice_colonne]` constitue une des solutions les plus simples. N'oublions pas que shape permet d'obtenir les dimensions (lignes et colonnes) du DataFrame.
 ###### Acceder aux cinq premières lignes de toutes les colonnes
 ```python
-
+values.iloc[0:5,0:2]
 ```
 
 ###### Acceder à toutes les lignes de la dernière colonne
 ```python
-
+values.iloc[:,-1]
 ```
 
 ###### Acceder aux cinq premières lignes des colonnes 0, 2 et 3
 ```python
-
+df.iloc[:5, [0,2,3]]
 ```
 
 ##### Conversion de type
@@ -237,11 +246,12 @@ df.loc[ df['Gene Symbol'].isin(['fadR', 'arcA'] ) ]
 
 ##### 2. Representez par un histogramme les valeurs de `Log2 Corrected Abundance Ratio`
 
-<!-- ##### 3. A partir de cette échantillon de ratio d'abondance,  estimez la moyenne <img src="https://render.githubusercontent.com/render/math?math=\mu"> et l'ecart-type <img src="https://render.githubusercontent.com/render/math?math=\sigma"> d'une loi normale. -->
+<!-- ##### 3. A partir de cet échantillon de ratio d'abondance,  estimez la moyenne <img src="https://render.githubusercontent.com/render/math?math=\mu"> et l'ecart-type <img src="https://render.githubusercontent.com/render/math?math=\sigma"> d'une loi normale. -->
 
-##### 3. A partir de cette échantillon de ratio d'abondance,  estimez la moyenne $\mu$ et l'ecart-type $\sigma$ d'une loi normale.
+##### 3. A partir de cet échantillon de ratio d'abondance,  estimez la moyenne $\mu$ et l'ecart-type $\sigma$ d'une loi normale.
 ```
-
+moyenne = np.mean(df['Log2 Corrected Abundance Ratio']) = -0.63862621564433
+ecart_type = np.std(df['Log2 Corrected Abundance Ratio']) = 0.47062451611275274
 
 ```
 
@@ -258,12 +268,12 @@ scale = len(_)*dx # scale accordingly
 ax.plot(x, norm.pdf(x, mu, sigma)*scale) # compute theoritical PDF and draw it
 ```
 
-![Histogramme à inserez ici](histogram_log2FC.png "Title")
+![Histogramme à inserez ici](hist_norm.png "Title")
 
 ##### 5. Quelles remarques peut-on faire à l'observation de l'histogramme et de la loi théorique?
 
 ```
-
+La loi théorique ne se superpose pas à l'historamme
 
 ```
 
@@ -272,7 +282,7 @@ ax.plot(x, norm.pdf(x, mu, sigma)*scale) # compute theoritical PDF and draw it
 ##### A l'aide de la méthode [scatter](https://matplotlib.org/3.1.1/api/_as_gen/matplotlib.axes.Axes.scatter.html) representer $\text{Log}_{10}({\text{p-value}}) = f(\text{Log}_2(\text{abundance ratio}))$
 
 ##### Matérialisez le quadrant des protéines surabondantes, par deux droites ou un rectangle
-Sont condidérées comme surabondantes les proteines remplissant ces deux critères:
+Sont considérées comme surabondantes les proteines remplissant ces deux critères:
 
 * $\text{Log}_2(\text{abundance ratio})\gt\mu%2B\sigma$
 * $\text{p-value}<0.001$
@@ -287,9 +297,7 @@ Nous allons implementer une approche ORA (Over Representation Analysis) naive.
 
 Quelles sont leurs identifiants UNIPROT ?
 ``` 
-
-
-
+'P23721','P77804',P0A6K6','P0A799' ,'P0A7G6' ,'P0A6F3' ,'P25745' ,'P0A6M8' ,'P0A6L0' ,'P0A8V6' ,'P0A9Q1' ,'P02358' ,'P0ACF8' ,'P62399' ,'P0A905' ,'P76506' ,'P13036' ,'P10384' ,'P06971' ,'P0A910' ,'P06996' ,'P76344' ,'P02931' 
 ```
 
 #### 2. Listez les termes GO portés par ces protéines surabondates
@@ -345,22 +353,22 @@ Ce dictionnaire pourrait être de la forme suivante:
                 }
   }
 ```
-Vous implémenterez la construction de ce dictionnaire et ainsi stockerez, pour la suite de l'analyse, les représentations des termes GO parmi les protéines surabondantes.
+Vous implémenterez la construction de ce dictionnaire et ainsi vous stockerez, pour la suite de l'analyse, les représentations des termes GO parmi les protéines surabondantes.
 
 #### 3. Obtention des paramètres du modèle
 
 Nous évaluerons la significativité de la présence de tous les termes GO portés par les protéines surabondantes à l'aide d'un [modèle hypergéometrique](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.hypergeom.html).
 
-Si k protéines surabondantes porte un terme GO, la pvalue de ce terme sera équivalente à  $P(X\ge k | X \sim H(k,K,n,N) )$
+Si k protéines surabondantes porte un terme GO, la pvalue de ce terme sera équivalente à $P(X\ge k | X \sim H(k,K,n,N) )$
 
 Completer le tableau ci-dessous avec les quantités vous semblant adéquates pour modeliser la pvalue de **chaque pathway [termes GO]**
 
 | Symboles | Paramètres | Quantités Biologiques |
 | --- | --- | --- |
-| k | nombre de succès observés| |
-| K | nombre de succès possibles| |
-| n | nombre d'observations| |
-| N | nombre d'elements observables| |
+| k | nombre de succès observés| nombre de proteines surexprimées qui supportent le go termes |
+| K | nombre de succès possibles| nombre de protéines au total qui supprotent le go termes  |
+| n | nombre d'observations| nombre de protéines surexprimées |
+| N | nombre d'elements observables| nombre total de protéines |
 
 #### 4. Calcul de l'enrichissement en fonctions biologiques
 
@@ -393,7 +401,7 @@ Combien d'interactions contient ce réseau ?
 
 ```
 
-
+38
 
 
 ```
@@ -409,7 +417,13 @@ Combien d'interactions sont supportées par chaque source ('Textmining', 'Experi
 Hint: l'onglet Analysis, donne accès aux nombre des interactions du réseau.
 ```
 
-
+'Textmining':29
+'Experiments':8
+'Databases': 4
+'Co-expression': 9
+'Neighborhood':1
+'Gene Fusion': 0
+'Co-occurence': 7
 
 
 ```
@@ -421,7 +435,7 @@ Consulter la rubrique 'Network Stats' dans l'onglet Analysis.
 Que peut-on en conclure sur les interactions de ce petit ensemble de protéines ?
 ```
 
-
+on a significativement plus d'interaction qu'attendu
 
 
 ```
